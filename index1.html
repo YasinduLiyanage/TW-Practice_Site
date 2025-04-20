@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz List 1</title>
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      background:#f5f7fa;
+      margin:0;
+      padding:1rem;
+      line-height:1.6;
+    }
+    h1{
+      text-align:center;
+      margin-bottom:1rem;
+    }
+    .question{
+      background:#fff;
+      padding:1rem;
+      border-radius:0.75rem;
+      margin-bottom:1rem;
+      box-shadow:0 2px 6px rgba(0,0,0,0.07);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:1rem;
+      flex-wrap:wrap;
+    }
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{
+      flex:1 1 220px;
+      padding:0.4rem;
+      border-radius:0.55rem;
+      border:1px solid #ccc;
+      font-size:1rem;
+      background:#fafafa;
+    }
+    button{
+      display:block;
+      margin:2rem auto;
+      padding:0.7rem 1.7rem;
+      font-size:1.1rem;
+      border:none;
+      border-radius:0.75rem;
+      cursor:pointer;
+      box-shadow:0 2px 5px rgba(0,0,0,0.15);
+      background:#0d6efd;
+      color:#fff;
+    }
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+
+<script>
+// ---------------- data ----------------
+const academicWords=[
+  "analysis","approach","area","assessment","assume","authority","available","benefit","concept","consistent","constitutional","context","contract","create","data","definition","derived","distribution","economic","environment","established","estimate","evidence","export","factors","financial","formula","function","identified","income","indicate","individual","interpretation","involved","issues","labour","legal","legislation","major","method","occur","percent","period","policy","principle","procedure","process","required","research","response","role","section","sector","significant","similar","source","specific","structure","theory","variables"
+];
+
+// ----- helper: random sample (no replacement) -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const sample=[];
+  for(let i=0;i<n && copy.length;i++){
+    const idx=Math.floor(Math.random()*copy.length);
+    sample.push(copy.splice(idx,1)[0]);
+  }
+  return sample;
+}
+
+// Return shuffled array
+function shuffle(arr){
+  return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);
+}
+
+// --------------- question bank ---------------
+const questions=[
+  {text:"A careful <u>look at</u> the results shows a clear trend.",answer:"analysis"},
+  {text:"We need a new <u>way of dealing with</u> this problem.",answer:"approach"},
+  {text:"The <u>place</u> surrounding the school is very quiet.",answer:"area"},
+  {text:"Final grades will be based on a written exam and a practical <u>test</u>.",answer:"assessment"},
+  {text:"Many people <u>think</u> that prices will rise again.",answer:"assume"},
+  {text:"The local <u>people in charge</u> have banned smoking in restaurants.",answer:"authority"},
+  {text:"No tickets are <u>on hand</u> for tonight's show.",answer:"available"},
+  {text:"Exercise is a real <u>good thing</u> to your health.",answer:"benefit"},
+  {text:"Children first learn the basic <u>idea</u> of numbers at school.",answer:"concept"},
+  {text:"Her results were <u>always the same</u> over several trials.",answer:"consistent"},
+  {text:"Freedom of speech is protected by the country's <u>main law</u>.",answer:"constitutional"},
+  {text:"You can guess the meaning by looking at the word in <u>the surrounding situation</u>.",answer:"context"},
+  {text:"We signed a <u>formal agreement</u> for the sale this morning.",answer:"contract"},
+  {text:"The new software will <u>make</u> a backup of your files automatically.",answer:"create"},
+  {text:"Survey <u>information</u> were collected from 500 households.",answer:"data"},
+  {text:"Can you give me a clear <u>meaning</u> of this term?",answer:"definition"},
+  {text:"The English word 'camera' is <u>taken from</u> Latin.",answer:"derived"},
+  {text:"The map shows the <u>spreading</u> of population across the island.",answer:"distribution"},
+  {text:"The country is facing serious <u>money‑related</u> problems.",answer:"economic"},
+  {text:"Pollution damages the natural <u>surroundings</u>.",answer:"environment"},
+  {text:"The company was <u>set up</u> in 1996.",answer:"established"},
+  {text:"My rough <u>guess</u> is that the repairs will cost $500.",answer:"estimate"},
+  {text:"There is no <u>proof</u> that he broke the law.",answer:"evidence"},
+  {text:"The farmers hope to <u>sell abroad</u> most of their tea.",answer:"export"},
+  {text:"Price, location and size are important <u>reasons</u> when buying a house.",answer:"factors"},
+  {text:"She needs <u>money</u> advice before investing.",answer:"financial"},
+  {text:"The teacher showed us a simple <u>rule</u> for calculating area.",answer:"formula"},
+  {text:"The main <u>purpose</u> of the committee is to raise funds.",answer:"function"},
+  {text:"Witnesses have <u>picked out</u> the suspect.",answer:"identified"},
+  {text:"His weekly <u>earnings</u> are higher than mine.",answer:"income"},
+  {text:"Figures <u>show</u> that unemployment is falling.",answer:"indicate"},
+  {text:"Each <u>person</u> must register separately.",answer:"individual"},
+  {text:"His <u>explanation</u> of the data was convincing.",answer:"interpretation"},
+  {text:"Several countries were <u>included</u> in the study.",answer:"involved"},
+  {text:"Environmental <u>problems</u> are getting worse.",answer:"issues"},
+  {text:"Skilled <u>workers</u> are in short supply.",answer:"labour"},
+  {text:"They sought <u>lawful</u> advice.",answer:"legal"},
+  {text:"New <u>laws</u> have been introduced to protect consumers.",answer:"legislation"},
+  {text:"Pollution is a <u>big</u> concern in the city.",answer:"major"},
+  {text:"Scientists developed a new <u>way</u> of testing the drug.",answer:"method"},
+  {text:"Earthquakes sometimes <u>happen</u> in this region.",answer:"occur"},
+  {text:"Only a small <u>per hundred</u> of students failed the exam.",answer:"percent"},
+  {text:"The project was completed within a short <u>time span</u>.",answer:"period"},
+  {text:"The government announced a new foreign‑aid <u>plan of action</u>.",answer:"policy"},
+  {text:"Honesty is a basic <u>basic rule</u> of good science.",answer:"principle"},
+  {text:"The visa <u>step‑by‑step process</u> is quite simple.",answer:"procedure"},
+  {text:"Learning a language is a long <u>series of actions</u>.",answer:"process"},
+  {text:"Payment is <u>needed</u> before delivery.",answer:"required"},
+  {text:"She is doing <u>study</u> on climate change.",answer:"research"},
+  {text:"We got no <u>answer</u> to our letter.",answer:"response"},
+  {text:"He played an important <u>part</u> in the negotiations.",answer:"role"},
+  {text:"Please read the next <u>part of something</u> of the article.",answer:"section"},
+  {text:"The public <u>part of the economy</u> needs reform.",answer:"sector"},
+  {text:"There was a <u>important</u> increase in sales last year.",answer:"significant"},
+  {text:"The two cultures are quite <u>alike</u> in many ways.",answer:"similar"},
+  {text:"We traced the rumor back to its original <u>origin</u>.",answer:"source"},
+  {text:"He gave me no <u>particular</u> reason for leaving.",answer:"specific"},
+  {text:"The new bridge has a steel <u>organization</u> underneath.",answer:"structure"},
+  {text:"Einstein's <u>explanation</u> of relativity was revolutionary.",answer:"theory"},
+  {text:"Temperature and pressure are <u>changing factors</u> in the experiment.",answer:"variables"}
+];
+
+// --------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  // choose 14 random distractors that are not the answer
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const opts=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.disabled=true;ph.selected=true;ph.textContent="Choose";sel.appendChild(ph);
+  opts.forEach(word=>{
+    const opt=document.createElement('option');
+    opt.value=word;
+    opt.textContent=word.charAt(0).toUpperCase()+word.slice(1);
+    sel.appendChild(opt);
+  });
+  wrap.appendChild(p);
+  wrap.appendChild(sel);
+  quizDiv.appendChild(wrap);
+});
+
+// --------------- grading ---------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){
+      correct++; sel.style.borderColor="#28a745";
+    }else sel.style.borderColor="#dc3545";
+  });
+  const pc=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${pc}%).`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 6</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 6 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+// ---------------- word bank ----------------
+const academicWords=[
+  "abstract","accurate","acknowledged","aggregate","allocation","assigned","attached","author","bond","brief","capable","cited","cooperative","discrimination","display","diversity","domain","edition","enhanced","estate","exceed","expert","explicit","federal","fees","flexibility","furthermore","gender","ignored","incentive","incidence","incorporated","index","inhibition","initiatives","input","instructions","intelligence","interval","lecture","migration","minimum","ministry","motivation","neutral","nevertheless","overseas","preceding","presumption","rational","recovery","revealed","scope","subsidiary","tapes","trace","transformation","transport","underlying","utility"
+];
+
+// ----- helper functions -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const out=[];
+  while(out.length<n && copy.length){
+    const idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+// ---------------- question bank ----------------
+const questions=[
+  {text:"Write an <u>summary</u> of the article in 200 words.",answer:"abstract"},
+  {text:"Make sure the figures are <u>exact</u>.",answer:"accurate"},
+  {text:"He is an <u>accepted</u> leader in the field.",answer:"acknowledged"},
+  {text:"The <u>total</u> data show a clear trend.",answer:"aggregate"},
+  {text:"Budget <u>distribution</u> will be discussed tomorrow.",answer:"allocation"},
+  {text:"Tasks were <u>given</u> to each team member.",answer:"assigned"},
+  {text:"The file is <u>joined</u> to the email.",answer:"attached"},
+  {text:"She is the <u>writer</u> of three novels.",answer:"author"},
+  {text:"A strong social <u>connection</u> formed among them.",answer:"bond"},
+  {text:"Give a <u>short</u> overview of your results.",answer:"brief"},
+  {text:"He is fully <u>able</u> to handle the work.",answer:"capable"},
+  {text:"The study was <u>mentioned</u> in the report.",answer:"cited"},
+  {text:"The project needs <u>collaborative</u> effort.",answer:"cooperative"},
+  {text:"Laws forbid <u>unfair treatment</u> based on race.",answer:"discrimination"},
+  {text:"Results will <u>show</u> on screen.",answer:"display"},
+  {text:"Cultural <u>variety</u> enriches society.",answer:"diversity"},
+  {text:"Physics is a <u>field</u> of science.",answer:"domain"},
+  {text:"This is the second <u>version</u> of the textbook.",answer:"edition"},
+  {text:"The software has <u>improved</u> security.",answer:"enhanced"},
+  {text:"He invested in real <u>property</u>.",answer:"estate"},
+  {text:"Costs may <u>go beyond</u> predictions.",answer:"exceed"},
+  {text:"We hired an <u>specialist</u> consultant.",answer:"expert"},
+  {text:"Give <u>clear</u> instructions.",answer:"explicit"},
+  {text:"Taxes are set by the <u>national</u> government.",answer:"federal"},
+  {text:"Tuition <u>charges</u> increased again.",answer:"fees"},
+  {text:"Job <u>adaptability</u> is important.",answer:"flexibility"},
+  {text:"<u>In addition</u>, we surveyed teachers.",answer:"furthermore"},
+  {text:"Pay gaps still exist between <u>men and women</u>.",answer:"gender"},
+  {text:"Warnings were <u>disregarded</u>.",answer:"ignored"},
+  {text:"Bonuses give workers an <u>motivation</u>.",answer:"incentive"},
+  {text:"The <u>rate</u> of disease is rising.",answer:"incidence"},
+  {text:"The company was <u>merged</u> in 2010.",answer:"incorporated"},
+  {text:"Search the subject <u>catalogue</u> for articles.",answer:"index"},
+  {text:"Stress causes <u>restraint</u> in performance.",answer:"inhibition"},
+  {text:"Health <u>programmes</u> aim to cut smoking.",answer:"initiatives"},
+  {text:"We need your <u>data</u> before 5 pm.",answer:"input"},
+  {text:"Follow the safety <u>directions</u> carefully.",answer:"instructions"},
+  {text:"Artificial <u>brain power</u> is advancing quickly.",answer:"intelligence"},
+  {text:"Take a ten‑minute <u>gap</u> between sessions.",answer:"interval"},
+  {text:"The <u>talk</u> begins at nine.",answer:"lecture"},
+  {text:"Bird <u>movement</u> patterns were studied.",answer:"migration"},
+  {text:"A <u>least</u> of two samples are required.",answer:"minimum"},
+  {text:"The <u>government department</u> issued a warning.",answer:"ministry"},
+  {text:"High <u>drive</u> leads to success.",answer:"motivation"},
+  {text:"The article takes a <u>impartial</u> stance.",answer:"neutral"},
+  {text:"It was raining; <u>even so</u>, we went out.",answer:"nevertheless"},
+  {text:"She studied <u>abroad</u> for two years.",answer:"overseas"},
+  {text:"The <u>earlier</u> chapter explained this.",answer:"preceding"},
+  {text:"The <u>assumption</u> is that demand will grow.",answer:"presumption"},
+  {text:"His approach is entirely <u>logical</u>.",answer:"rational"},
+  {text:"Economic <u>bounce‑back</u> was rapid.",answer:"recovery"},
+  {text:"The report <u>showed</u> new problems.",answer:"revealed"},
+  {text:"The study's <u>range</u> is limited.",answer:"scope"},
+  {text:"It became a <u>branch</u> of the parent firm.",answer:"subsidiary"},
+  {text:"Old <u>recordings</u> were digitised.",answer:"tapes"},
+  {text:"Scientists found a <u>sign</u> of water.",answer:"trace"},
+  {text:"Urban <u>change</u> reshaped the area.",answer:"transformation"},
+  {text:"Public <u>transportation</u> needs funding.",answer:"transport"},
+  {text:"We examined the <u>basic</u> causes.",answer:"underlying"},
+  {text:"Water has many practical <u>uses</u>.",answer:"utility"}
+];
+
+// ---------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const options=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  options.forEach(w=>{
+    const opt=document.createElement('option');opt.value=w;opt.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(opt);
+  });
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+// ---------------- grading ----------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){
+      correct++; sel.style.borderColor="#28a745";
+    }else{
+      sel.style.borderColor="#dc3545";
+    }
+  });
+  const percent=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${percent}%).`;
+});
+</script>
+</body>
+</html>

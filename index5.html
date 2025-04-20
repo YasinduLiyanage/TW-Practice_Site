@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 5</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 5 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+// ---------------- word bank ----------------
+const academicWords=[
+  "academic","adjustment","alter","amendment","aware","capacity","challenge","clause","compounds","conflict","consultation","contact","decline","discretion","draft","enable","energy","enforcement","entities","equivalent","evolution","expansion","exposure","external","facilitate","fundamental","generated","generation","image","liberal","licence","logic","marginal","medical","mental","modified","monitoring","network","notion","objective","orientation","perspective","precise","prime","psychology","pursue","ratio","rejected","revenue","stability","styles","substitution","sustainable","symbolic","target","transition","trend","version","welfare","whereas"
+];
+
+// ----- helper functions -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const out=[];
+  while(out.length<n && copy.length){
+    const idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+// ---------------- question bank ----------------
+const questions=[
+  {text:"She published an <u>university‑level</u> paper on climate change.",answer:"academic"},
+  {text:"A small <u>change</u> was made to the schedule.",answer:"adjustment"},
+  {text:"You can <u>change</u> the layout if you wish.",answer:"alter"},
+  {text:"Parliament passed an <u>change to the law</u> yesterday.",answer:"amendment"},
+  {text:"Drivers must be <u>conscious</u> of speed limits.",answer:"aware"},
+  {text:"The hall has a seating <u>ability</u> of 500 people.",answer:"capacity"},
+  {text:"Running a marathon is a big <u>test</u> for anyone.",answer:"challenge"},
+  {text:"Add a safety <u>section</u> to the contract.",answer:"clause"},
+  {text:"Salt <u>mixtures</u> make the solution conductive.",answer:"compounds"},
+  {text:"Years of <u>disagreement</u> ended with peace talks.",answer:"conflict"},
+  {text:"After <u>talks</u> with experts, we chose this design.",answer:"consultation"},
+  {text:"Please <u>get in touch</u> if you need help.",answer:"contact"},
+  {text:"There has been a sharp <u>drop</u> in sales.",answer:"decline"},
+  {text:"Use your <u>judgement</u> when sharing data.",answer:"discretion"},
+  {text:"This is only a first <u>version</u> of the report.",answer:"draft"},
+  {text:"The ramp will <u>allow</u> wheelchair access.",answer:"enable"},
+  {text:"Solar <u>power</u> is clean and renewable.",answer:"energy"},
+  {text:"Stricter law <u>application</u> reduced fraud.",answer:"enforcement"},
+  {text:"Small business <u>organisations</u> will benefit.",answer:"entities"},
+  {text:"A mile is roughly <u>equal</u> to 1.6 km.",answer:"equivalent"},
+  {text:"Language <u>development</u> is ongoing.",answer:"evolution"},
+  {text:"City <u>growth</u> has increased housing demand.",answer:"expansion"},
+  {text:"Excessive sun <u>contact</u> can harm skin.",answer:"exposure"},
+  {text:"The study looked at <u>outside</u> influences.",answer:"external"},
+  {text:"New tools <u>make easier</u> the design process.",answer:"facilitate"},
+  {text:"Trust is a <u>basic</u> part of teamwork.",answer:"fundamental"},
+  {text:"Heat is <u>produced</u> by the reaction.",answer:"generated"},
+  {text:"We interviewed the older <u>age group</u>.",answer:"generation"},
+  {text:"The brand's public <u>picture</u> improved.",answer:"image"},
+  {text:"She holds <u>open‑minded</u> political views.",answer:"liberal"},
+  {text:"You need a driving <u>permit</u> to rent a car.",answer:"licence"},
+  {text:"His argument lacked clear <u>reasoning</u>.",answer:"logic"},
+  {text:"There was only a <u>small</u> improvement.",answer:"marginal"},
+  {text:"He studies <u>health‑related</u> science.",answer:"medical"},
+  {text:"The illness affected her <u>mind</u> health.",answer:"mental"},
+  {text:"The proposal was <u>changed</u> after review.",answer:"modified"},
+  {text:"Air‐quality <u>checking</u> shows improvement.",answer:"monitoring"},
+  {text:"The social <u>system</u> of friends helped her.",answer:"network"},
+  {text:"The <u>idea</u> of fairness guides the policy.",answer:"notion"},
+  {text:"Our main <u>goal</u> is customer satisfaction.",answer:"objective"},
+  {text:"Student <u>introduction</u> week starts Monday.",answer:"orientation"},
+  {text:"From my <u>point of view</u>, it's risky.",answer:"perspective"},
+  {text:"We need a <u>exact</u> measurement.",answer:"precise"},
+  {text:"Safety is our <u>chief</u> concern.",answer:"prime"},
+  {text:"She majors in <u>the study of the mind</u>.",answer:"psychology"},
+  {text:"We will <u>follow</u> a research career.",answer:"pursue"},
+  {text:"The <u>proportion</u> of men to women is 3:2.",answer:"ratio"},
+  {text:"His proposal was <u>turned down</u>.",answer:"rejected"},
+  {text:"Tax increases boosted government <u>income</u>.",answer:"revenue"},
+  {text:"Price controls brought market <u>steadiness</u>.",answer:"stability"},
+  {text:"Different writing <u>forms</u> were compared.",answer:"styles"},
+  {text:"Copper can act as a <u>replacement</u> for tin.",answer:"substitution"},
+  {text:"We aim for <u>lasting</u> growth.",answer:"sustainable"},
+  {text:"The flag is <u>representative</u> of freedom.",answer:"symbolic"},
+  {text:"We set a clear <u>goal</u> for sales.",answer:"target"},
+  {text:"The city is in <u>changeover</u> to clean energy.",answer:"transition"},
+  {text:"There is a rising <u>pattern</u> toward remote work.",answer:"trend"},
+  {text:"This is the latest <u>edition</u> of the app.",answer:"version"},
+  {text:"Public <u>well‑being</u> is our priority.",answer:"welfare"},
+  {text:"Cats are independent, <u>while</u> dogs are social.",answer:"whereas"}
+];
+
+// ---------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const options=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  options.forEach(w=>{
+    const opt=document.createElement('option');opt.value=w;opt.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(opt);
+  });
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+// ---------------- grading ----------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){
+      correct++; sel.style.borderColor="#28a745";
+    }else{
+      sel.style.borderColor="#dc3545";
+    }
+  });
+  const percent=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${percent}%).`;
+});
+</script>
+</body>
+</html>

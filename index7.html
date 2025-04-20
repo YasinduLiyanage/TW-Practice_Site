@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 7</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 7 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+// ---------------- word bank ----------------
+const academicWords=[
+  "adaptation","adults","advocate","aid","channel","chemical","classical","comprehensive","comprise","confirmed","contrary","converted","couple","decades","definite","deny","differentiation","disposal","dynamic","eliminate","empirical","equipment","extract","file","finite","foundation","global","grade","guarantee","hierarchical","identical","ideology","inferred","innovation","insert","intervention","isolated","media","mode","paradigm","phenomenon","priority","prohibited","publication","quotation","release","reverse","simulation","solely","somewhat","submitted","successive","survive","thesis","topic","transmission","ultimately","unique","visible","voluntary"
+];
+
+// ----- helper functions -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const out=[];
+  while(out.length<n && copy.length){
+    const idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+// ---------------- question bank ----------------
+const questions=[
+  {text:"The film is an <u>change</u> of a famous novel.",answer:"adaptation"},
+  {text:"The survey questioned 500 <u>grown‑ups</u>.",answer:"adults"},
+  {text:"Many doctors <u>support</u> exercise for health.",answer:"advocate"},
+  {text:"First‑aid kits provide immediate <u>help</u>.",answer:"aid"},
+  {text:"TV is still a powerful <u>path</u> for advertising.",answer:"channel"},
+  {text:"A <u>substance</u> reaction caused the change.",answer:"chemical"},
+  {text:"She prefers <u>old‑style</u> music.",answer:"classical"},
+  {text:"We need a <u>complete</u> plan.",answer:"comprehensive"},
+  {text:"The committee will <u>contain</u> ten members.",answer:"comprise"},
+  {text:"The results were <u>proved</u> by other labs.",answer:"confirmed"},
+  {text:"<u>Opposite to</u> expectations, sales rose.",answer:"contrary"},
+  {text:"The warehouse was <u>changed</u> into offices.",answer:"converted"},
+  {text:"A <u>pair</u> of errors were found.",answer:"couple"},
+  {text:"He worked there for three <u>tens of years</u>.",answer:"decades"},
+  {text:"We need a <u>clear</u> answer.",answer:"definite"},
+  {text:"He will not <u>refuse</u> the claim.",answer:"deny"},
+  {text:"Colour <u>distinction</u> helps species identification.",answer:"differentiation"},
+  {text:"Waste <u>throwing away</u> must follow rules.",answer:"disposal"},
+  {text:"Markets are <u>changing</u> and unpredictable.",answer:"dynamic"},
+  {text:"We must <u>remove</u> outdated files.",answer:"eliminate"},
+  {text:"The theory lacks <u>observed</u> evidence.",answer:"empirical"},
+  {text:"Laboratory <u>tools</u> were calibrated.",answer:"equipment"},
+  {text:"Doctors can <u>take out</u> DNA from cells.",answer:"extract"},
+  {text:"Save the data in a new <u>document</u>.",answer:"file"},
+  {text:"Resources are <u>limited</u>.",answer:"finite"},
+  {text:"Trust is the <u>base</u> of good teamwork.",answer:"foundation"},
+  {text:"Climate change is a <u>worldwide</u> issue.",answer:"global"},
+  {text:"She received a high <u>score</u>.",answer:"grade"},
+  {text:"We cannot <u>promise</u> success.",answer:"guarantee"},
+  {text:"The company has a <u>layered</u> structure.",answer:"hierarchical"},
+  {text:"Results from the two tests were <u>exactly alike</u>.",answer:"identical"},
+  {text:"Democracy is more than an <u>set of beliefs</u>.",answer:"ideology"},
+  {text:"It can be <u>deduced</u> that rainfall will increase.",answer:"inferred"},
+  {text:"Solar panels are a key <u>new idea</u>.",answer:"innovation"},
+  {text:"Please <u>add</u> a graph into the report.",answer:"insert"},
+  {text:"Government <u>action</u> reduced poverty.",answer:"intervention"},
+  {text:"The village is <u>remote</u> from cities.",answer:"isolated"},
+  {text:"Social <u>press</u> shape opinions.",answer:"media"},
+  {text:"We changed the <u>method</u> of payment.",answer:"mode"},
+  {text:"Paradigm remains same term (use this) <u>pattern</u> → paradigm.",answer:"paradigm"},
+  {text:"Rainbows are a natural <u>occurrence</u>.",answer:"phenomenon"},
+  {text:"Safety is our main <u>importance</u>.",answer:"priority"},
+  {text:"Entry is <u>forbidden</u> to minors.",answer:"prohibited"},
+  {text:"The paper awaits <u>printing</u>.",answer:"publication"},
+  {text:"Use a <u>quote</u> to support your claim.",answer:"quotation"},
+  {text:"The company will <u>launch</u> the product next week.",answer:"release"},
+  {text:"Try the <u>opposite</u> process to test it.",answer:"reverse"},
+  {text:"The flight <u>model</u> uses computer <u>model</u> → simulation.",answer:"simulation"},
+  {text:"The decision was based <u>only</u> on data.",answer:"solely"},
+  {text:"I am <u>to some degree</u> satisfied.",answer:"somewhat"},
+  {text:"The form was <u>handed in</u> yesterday.",answer:"submitted"},
+  {text:"He won three <u>consecutive</u> awards.",answer:"successive"},
+  {text:"Plants <u>continue to live</u> in harsh climates.",answer:"survive"},
+  {text:"She is writing her master's <u>dissertation</u>.",answer:"thesis"},
+  {text:"Let's stick to one <u>subject</u>.",answer:"topic"},
+  {text:"Data <u>sending</u> was slow.",answer:"transmission"},
+  {text:"<u>In the end</u>, we chose plan B.",answer:"ultimately"},
+  {text:"Each fingerprint is <u>one‑of‑a‑kind</u>.",answer:"unique"},
+  {text:"The comet was easily <u>seen</u>.",answer:"visible"},
+  {text:"Participation is <u>optional</u>.",answer:"voluntary"}
+];
+
+// ---------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const options=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  options.forEach(w=>{
+    const opt=document.createElement('option');opt.value=w;opt.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(opt);
+  });
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+// ---------------- grading ----------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){
+      correct++; sel.style.borderColor="#28a745";
+    }else{
+      sel.style.borderColor="#dc3545";
+    }
+  });
+  const percent=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${percent}%).`;
+});
+</script>
+</body>
+</html>

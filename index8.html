@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 8</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 8 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+const academicWords=[
+  "abandon","accompanied","accumulation","ambiguous","appendix","appreciation","arbitrary","automatically","bias","chart","clarity","conformity","commodity","complement","contemporary","contradiction","crucial","currency","denote","detected","deviation","displacement","dramatic","eventually","exhibit","exploitation","fluctuations","guidelines","highlighted","implicit","induced","inevitably","infrastructure","inspection","intensity","manipulation","minimised","nuclear","offset","paragraph","plus","practitioners","predominantly","prospect","radical","random","reinforced","restore","revision","schedule","tension","termination","theme","thereby","uniform","vehicle","via","virtually","widespread","visual"
+];
+
+function getRandomSample(arr,n){const c=[...arr];const o=[];while(o.length<n&&c.length){o.push(c.splice(Math.floor(Math.random()*c.length),1)[0]);}return o;}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+const questions=[
+  {text:"They decided to <u>leave</u> the plan halfway.",answer:"abandon"},
+  {text:"The report was <u>together with</u> several charts.",answer:"accompanied"},
+  {text:"Snow caused an <u>build‑up</u> on the roof.",answer:"accumulation"},
+  {text:"His statement was rather <u>unclear</u>.",answer:"ambiguous"},
+  {text:"See <u>extra section</u> A for data tables.",answer:"appendix"},
+  {text:"We showed <u>gratitude</u> for her help.",answer:"appreciation"},
+  {text:"Choices seemed <u>random‑based</u>.",answer:"arbitrary"},
+  {text:"The doors close <u>by themselves</u> at 6 pm.",answer:"automatically"},
+  {text:"The study found racial <u>prejudice</u> in hiring.",answer:"bias"},
+  {text:"The sales <u>graph</u> shows growth.",answer:"chart"},
+  {text:"Rewrite for greater <u>clearness</u>.",answer:"clarity"},
+  {text:"Social <u>obedience</u> pressures behaviour.",answer:"conformity"},
+  {text:"Oil is a valuable <u>trade good</u>.",answer:"commodity"},
+  {text:"Protein <u>completes</u> the meal.",answer:"complement"},
+  {text:"He studies <u>modern</u> art.",answer:"contemporary"},
+  {text:"Data show a <u>conflict</u> with the theory.",answer:"contradiction"},
+  {text:"Accurate timing is <u>very important</u>.",answer:"crucial"},
+  {text:"The dollar is the main <u>money</u> in the US.",answer:"currency"},
+  {text:"Red stripes <u>signify</u> danger.",answer:"denote"},
+  {text:"Errors were <u>found</u> in the code.",answer:"detected"},
+  {text:"There was a slight <u>difference</u> from the norm.",answer:"deviation"},
+  {text:"The storm caused <u>moving away</u> of residents.",answer:"displacement"},
+  {text:"Stock prices saw a <u>huge</u> fall.",answer:"dramatic"},
+  {text:"He <u>finally</u> agreed.",answer:"eventually"},
+  {text:"The gallery will <u>show</u> new works.",answer:"exhibit"},
+  {text:"Worker <u>misuse</u> is illegal.",answer:"exploitation"},
+  {text:"Weather <u>ups and downs</u> affected yield.",answer:"fluctuations"},
+  {text:"Follow the safety <u>rules</u>.",answer:"guidelines"},
+  {text:"Key points were <u>emphasised</u> in bold.",answer:"highlighted"},
+  {text:"Meaning was <u>implied</u>, not stated.",answer:"implicit"},
+  {text:"Stress <u>caused</u> his illness.",answer:"induced"},
+  {text:"Prices will <u>unavoidably</u> rise.",answer:"inevitably"},
+  {text:"Road <u>framework</u> needs repair.",answer:"infrastructure"},
+  {text:"Regular <u>checking</u> ensures quality.",answer:"inspection"},
+  {text:"The study measured pain <u>strength</u>.",answer:"intensity"},
+  {text:"Data <u>handling</u> was transparent.",answer:"manipulation"},
+  {text:"Risks were <u>reduced</u> to a minimum.",answer:"minimised"},
+  {text:"They discussed <u>atomic</u> energy.",answer:"nuclear"},
+  {text:"Extra costs can be <u>balanced</u> by savings.",answer:"offset"},
+  {text:"Read the next <u>section</u>.",answer:"paragraph"},
+  {text:"Cost is 30 €, <u>and</u> shipping.",answer:"plus"},
+  {text:"Medical <u>professionals</u> attended.",answer:"practitioners"},
+  {text:"Results were <u>mainly</u> positive.",answer:"predominantly"},
+  {text:"Graduates have a good <u>chance</u> of jobs.",answer:"prospect"},
+  {text:"They proposed <u>extreme</u> reforms.",answer:"radical"},
+  {text:"Choose a <u>haphazard</u> sample.",answer:"random"},
+  {text:"Findings were <u>strengthened</u> by new data.",answer:"reinforced"},
+  {text:"The project aims to <u>bring back</u> wetlands.",answer:"restore"},
+  {text:"Submit any <u>updated</u> drafts.",answer:"revision"},
+  {text:"The work <u>timetable</u> is attached.",answer:"schedule"},
+  {text:"Negotiations created <u>strain</u> between teams.",answer:"tension"},
+  {text:"The <u>end</u> of the contract is June.",answer:"termination"},
+  {text:"Freedom is the central <u>subject</u>.",answer:"theme"},
+  {text:"He scored, <u>thus</u> we won.",answer:"thereby"},
+  {text:"Staff wore a <u>standard</u> uniform.",answer:"uniform"},
+  {text:"A truck is a <u>transport</u> <u>means</u> → vehicle.",answer:"vehicle"},
+  {text:"Goods were sent <u>through</u> Colombo.",answer:"via"},
+  {text:"The plan is <u>almost</u> complete.",answer:"virtually"},
+  {text:"The disease is <u>common</u> worldwide.",answer:"widespread"},
+  {text:"Add <u>graphic</u> aids to help readers.",answer:"visual"}
+];
+
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,i)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const opts=shuffle([...distractors,q.answer]);
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${i+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${i}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  opts.forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(o);});
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,i)=>{
+    const sel=document.getElementById(`q${i}`);
+    if(sel.value===q.answer){correct++;sel.style.borderColor="#28a745";}else{sel.style.borderColor="#dc3545";}
+  });
+  const pct=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${pct}%).`;
+});
+</script>
+</body>
+</html>

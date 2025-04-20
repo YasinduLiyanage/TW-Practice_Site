@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 3</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 3 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+// ---------------- word bank ----------------
+const academicWords=[
+  "alternative","circumstances","comments","compensation","components","consent","considerable","constant","constraints","contribution","convention","coordination","core","corporate","corresponding","criteria","deduction","demonstrate","document","dominant","emphasis","ensure","excluded","framework","funds","illustrated","immigration","implies","initial","instance","interaction","justification","layer","link","location","maximum","minorities","negative","outcomes","partnership","philosophy","physical","proportion","published","reaction","registered","reliance","removed","scheme","sequence","sex","shift","specified","sufficient","task","technical","techniques","technology","validity","volume"
+];
+
+// ----- helper functions -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const out=[];
+  for(let i=0;i<n && copy.length;i++){
+    const idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+// ---------------- question bank ----------------
+const questions=[
+  {text:"We need an <u>another choice</u> if this plan fails.",answer:"alternative"},
+  {text:"Under these <u>situations</u>, we must act quickly.",answer:"circumstances"},
+  {text:"Your helpful <u>remarks</u> were recorded.",answer:"comments"},
+  {text:"Workers received <u>payment</u> for extra hours.",answer:"compensation"},
+  {text:"The phone's main <u>parts</u> are the battery and screen.",answer:"components"},
+  {text:"Treatment requires the patient's <u>permission</u>.",answer:"consent"},
+  {text:"We spent a <u>a lot of</u> time on research.",answer:"considerable"},
+  {text:"He felt <u>never‑ending</u> pressure to succeed.",answer:"constant"},
+  {text:"Budget <u>limits</u> prevented expansion.",answer:"constraints"},
+  {text:"Thank you for your valuable <u>input</u>.",answer:"contribution"},
+  {text:"By <u>custom</u>, the chair speaks first.",answer:"convention"},
+  {text:"Good <u>working together</u> is essential in team sports.",answer:"coordination"},
+  {text:"Honesty is the <u>central part</u> of our values.",answer:"core"},
+  {text:"Many <u>big business</u> leaders support the proposal.",answer:"corporate"},
+  {text:"Attach the <u>matching</u> figures to each table.",answer:"corresponding"},
+  {text:"We used strict <u>standards</u> to select winners.",answer:"criteria"},
+  {text:"Tax <u>subtraction</u> lowered his bill.",answer:"deduction"},
+  {text:"Experiments <u>show</u> the theory is correct.",answer:"demonstrate"},
+  {text:"Sign this <u>paper</u> before the meeting.",answer:"document"},
+  {text:"English is the <u>most powerful</u> language on the internet.",answer:"dominant"},
+  {text:"The report places <u>stress</u> on safety.",answer:"emphasis"},
+  {text:"Please <u>make sure</u> all doors are locked.",answer:"ensure"},
+  {text:"Two samples were <u>left out</u> of the study.",answer:"excluded"},
+  {text:"The new law creates a legal <u>structure</u> for trade.",answer:"framework"},
+  {text:"We need more <u>money</u> to finish the project.",answer:"funds"},
+  {text:"The results are <u>shown</u> in Figure 2.",answer:"illustrated"},
+  {text:"The country has strict <u>moving to another country</u> policies.",answer:"immigration"},
+  {text:"His silence <u>suggests</u> agreement.",answer:"implies"},
+  {text:"Our <u>first</u> goal is to gather data.",answer:"initial"},
+  {text:"For <u>example</u>, consider the case of Japan.",answer:"instance"},
+  {text:"Teacher‑student <u>communication</u> improves learning.",answer:"interaction"},
+  {text:"He offered no <u>reason</u> for the delay.",answer:"justification"},
+  {text:"Add another <u>level</u> of paint.",answer:"layer"},
+  {text:"Studies show a <u>connection</u> between diet and health.",answer:"link"},
+  {text:"The <u>place</u> of the event has changed.",answer:"location"},
+  {text:"The <u>biggest</u> score possible is 100.",answer:"maximum"},
+  {text:"Policies protect ethnic <u>smaller groups</u>.",answer:"minorities"},
+  {text:"The feedback was mostly <u>bad</u>.",answer:"negative"},
+  {text:"We measured the <u>results</u> of the program.",answer:"outcomes"},
+  {text:"The two firms formed a <u>working together</u>.",answer:"partnership"},
+  {text:"Her teaching <u>set of beliefs</u> is student‑centered.",answer:"philosophy"},
+  {text:"Regular <u>bodily</u> exercise is vital.",answer:"physical"},
+  {text:"A large <u>percentage</u> of students passed.",answer:"proportion"},
+  {text:"The study was <u>printed</u> last year.",answer:"published"},
+  {text:"Her <u>response</u> was immediate.",answer:"reaction"},
+  {text:"He <u>officially signed up</u> as a voter.",answer:"registered"},
+  {text:"Excessive <u>dependence</u> on oil is risky.",answer:"reliance"},
+  {text:"The statue was <u>taken away</u> after protests.",answer:"removed"},
+  {text:"The city launched a recycling <u>plan</u>.",answer:"scheme"},
+  {text:"Follow the steps in the correct <u>order</u>.",answer:"sequence"},
+  {text:"The survey recorded each participant's <u>gender</u>.",answer:"sex"},
+  {text:"There was a major <u>change</u> in policy.",answer:"shift"},
+  {text:"Complete the form in the <u>stated</u> order.",answer:"specified"},
+  {text:"We have <u>enough</u> evidence now.",answer:"sufficient"},
+  {text:"Your main <u>job</u> is to edit the report.",answer:"task"},
+  {text:"The manual uses many <u>specialised</u> terms.",answer:"technical"},
+  {text:"Students learn basic research <u>methods</u>.",answer:"techniques"},
+  {text:"New <u>modern devices</u> reduce costs.",answer:"technology"},
+  {text:"Researchers questioned the <u>soundness</u> of the claims.",answer:"validity"},
+  {text:"Sales <u>amount</u> increased by 20%.",answer:"volume"}
+];
+
+// ---------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const options=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  options.forEach(w=>{
+    const opt=document.createElement('option');opt.value=w;opt.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(opt);
+  });
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+// ---------------- grading ----------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){correct++;sel.style.borderColor="#28a745";}else sel.style.borderColor="#dc3545";
+  });
+  const percent=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${percent}%).`;
+});
+</script>
+</body>
+</html>

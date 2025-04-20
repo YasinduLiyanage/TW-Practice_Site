@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Vocabulary Substitution Quiz – List 2</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;padding:1rem;line-height:1.6;}
+    h1{text-align:center;margin-bottom:1rem;}
+    .question{background:#fff;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .question p{flex:1 1 70%;margin:0;}
+    u{text-decoration:underline dotted #555;}
+    select{flex:1 1 220px;padding:0.4rem;border-radius:0.55rem;border:1px solid #ccc;font-size:1rem;background:#fafafa;}
+    button{display:block;margin:2rem auto;padding:0.7rem 1.7rem;font-size:1.1rem;border:none;border-radius:0.75rem;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.15);background:#0d6efd;color:#fff;}
+    #result{text-align:center;font-size:1.3rem;font-weight:bold;margin-top:1rem;}
+    @media(max-width:600px){.question p{flex:1 1 100%;}select{flex:1 1 100%;}}
+  </style>
+</head>
+<body>
+  <h1>Academic Word List 2 – Formal Substitution Quiz</h1>
+  <div id="quiz"></div>
+  <button id="submit">Check Answers</button>
+  <div id="result"></div>
+<script>
+// ---------------- word bank ----------------
+const academicWords=[
+  "achieve","acquisition","administration","affect","appropriate","aspects","assistance","categories","chapter","commission","community","complex","computer","conclusion","conduct","consequences","construction","consumer","credit","cultural","design","distinction","elements","equation","evaluation","features","final","focus","impact","injury","institute","investment","items","journal","maintenance","normal","obtained","participation","perceived","positive","potential","previous","primary","purchase","range","region","regulations","relevant","resident","resources","restricted","security","sought","select","site","strategies","survey","text","traditional","transfer"
+];
+
+// ----- helper functions -----
+function getRandomSample(arr,n){
+  const copy=[...arr];
+  const out=[];
+  for(let i=0;i<n && copy.length;i++){
+    const idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+function shuffle(arr){return arr.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(({v})=>v);}
+
+// ---------------- question bank ----------------
+const questions=[
+  {text:"He worked hard and finally <u>reached</u> his goal.",answer:"achieve"},
+  {text:"The company's latest <u>purchase</u> has strengthened its market position.",answer:"acquisition"},
+  {text:"The new <u>management</u> plans to cut costs.",answer:"administration"},
+  {text:"Rising fuel prices will <u>influence</u> transport costs.",answer:"affect"},
+  {text:"Wear <u>suitable</u> clothing for the interview.",answer:"appropriate"},
+  {text:"All <u>parts</u> of the plan were discussed.",answer:"aspects"},
+  {text:"She asked for <u>help</u> with the project.",answer:"assistance"},
+  {text:"The books are divided into several <u>groups</u>.",answer:"categories"},
+  {text:"Please read the first <u>section</u> of the novel.",answer:"chapter"},
+  {text:"He received a 10% <u>fee</u> on every sale.",answer:"commission"},
+  {text:"The local <u>neighbourhood</u> raised funds for the school.",answer:"community"},
+  {text:"It's a very <u>complicated</u> issue.",answer:"complex"},
+  {text:"All the data are stored on the main <u>machine</u>.",answer:"computer"},
+  {text:"The study reached the <u>end result</u> that the drug is safe.",answer:"conclusion"},
+  {text:"Scientists <u>carry out</u> experiments in the lab.",answer:"conduct"},
+  {text:"She understood the <u>results</u> of her actions.",answer:"consequences"},
+  {text:"The <u>building</u> of the bridge will begin soon.",answer:"construction"},
+  {text:"Price increases will hurt the <u>buyers</u> the most.",answer:"consumer"},
+  {text:"He paid by <u>card</u> rather than cash.",answer:"credit"},
+  {text:"The museum hosts many <u>arts‑related</u> events.",answer:"cultural"},
+  {text:"The architect will <u>plan</u> the new library.",answer:"design"},
+  {text:"There is a clear <u>difference</u> between the two methods.",answer:"distinction"},
+  {text:"Water and air are essential <u>parts</u> of life.",answer:"elements"},
+  {text:"Solve the following <u>math sentence</u>.",answer:"equation"},
+  {text:"The report needs careful <u>review</u>.",answer:"evaluation"},
+  {text:"The phone's best <u>qualities</u> are its camera and battery.",answer:"features"},
+  {text:"We are waiting for the <u>last</u> decision.",answer:"final"},
+  {text:"We need to <u>concentrate</u> on the main issue.",answer:"focus"},
+  {text:"The new policy had a huge <u>effect</u> on sales.",answer:"impact"},
+  {text:"He was taken to hospital with a serious <u>wound</u>.",answer:"injury"},
+  {text:"The company decided to <u>set up</u> a new training programme.",answer:"institute"},
+  {text:"Buying property is a good <u>use of funds</u>.",answer:"investment"},
+  {text:"Please list all the <u>things</u> in the box.",answer:"items"},
+  {text:"The findings were published in a leading <u>magazine</u>.",answer:"journal"},
+  {text:"The machines need regular <u>upkeep</u>.",answer:"maintenance"},
+  {text:"It is <u>usual</u> to shake hands in greeting.",answer:"normal"},
+  {text:"The data were <u>got</u> from surveys.",answer:"obtained"},
+  {text:"Student <u>involvement</u> is encouraged.",answer:"participation"},
+  {text:"The risk is higher than it is <u>seen</u> by the public.",answer:"perceived"},
+  {text:"The feedback was very <u>good</u>.",answer:"positive"},
+  {text:"The project has great <u>possibility</u> for growth.",answer:"potential"},
+  {text:"I have no memory of the <u>earlier</u> event.",answer:"previous"},
+  {text:"Our <u>main</u> concern is safety.",answer:"primary"},
+  {text:"She plans to <u>buy</u> a new car.",answer:"purchase"},
+  {text:"The store offers a wide <u>variety</u> of products.",answer:"range"},
+  {text:"Farmers in this <u>area</u> grow rice.",answer:"region"},
+  {text:"The industry is governed by strict <u>rules</u>.",answer:"regulations"},
+  {text:"Please include all <u>related</u> information.",answer:"relevant"},
+  {text:"Every <u>person who lives</u> in the building must register.",answer:"resident"},
+  {text:"The country has rich natural <u>supplies</u>.",answer:"resources"},
+  {text:"Access to the lab is <u>limited</u> to staff.",answer:"restricted"},
+  {text:"Airport <u>safety</u> has been increased.",answer:"security"},
+  {text:"The answer was <u>looked for</u> by many scientists.",answer:"sought"},
+  {text:"You may <u>pick</u> any seat.",answer:"select"},
+  {text:"The company chose a new <u>location</u> for its headquarters.",answer:"site"},
+  {text:"They discussed several <u>plans</u> to reduce costs.",answer:"strategies"},
+  {text:"We conducted a customer <u>questionnaire</u>.",answer:"survey"},
+  {text:"Please read the following <u>passage</u> carefully.",answer:"text"},
+  {text:"They wore <u>old‑fashioned</u> clothes for the ceremony.",answer:"traditional"},
+  {text:"She wants to <u>move</u> money to another account.",answer:"transfer"}
+];
+
+// ---------------- render ----------------
+const quizDiv=document.getElementById('quiz');
+questions.forEach((q,idx)=>{
+  const distractors=getRandomSample(academicWords.filter(w=>w!==q.answer),14);
+  const options=shuffle([...distractors,q.answer]);
+
+  const wrap=document.createElement('div');wrap.className='question';
+  const p=document.createElement('p');p.innerHTML=`${idx+1}. ${q.text}`;
+  const sel=document.createElement('select');sel.id=`q${idx}`;
+  const ph=document.createElement('option');ph.value="";ph.textContent="Choose";ph.disabled=true;ph.selected=true;sel.appendChild(ph);
+  options.forEach(w=>{
+    const opt=document.createElement('option');opt.value=w;opt.textContent=w.charAt(0).toUpperCase()+w.slice(1);sel.appendChild(opt);
+  });
+  wrap.appendChild(p);wrap.appendChild(sel);quizDiv.appendChild(wrap);
+});
+
+// ---------------- grading ----------------
+document.getElementById('submit').addEventListener('click',()=>{
+  let correct=0;
+  questions.forEach((q,idx)=>{
+    const sel=document.getElementById(`q${idx}`);
+    if(sel.value===q.answer){correct++;sel.style.borderColor="#28a745";}else sel.style.borderColor="#dc3545";
+  });
+  const percent=Math.round(correct/questions.length*100);
+  document.getElementById('result').textContent=`You got ${correct}/${questions.length} correct (${percent}%).`;
+});
+</script>
+</body>
+</html>
